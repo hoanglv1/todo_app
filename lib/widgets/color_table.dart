@@ -11,14 +11,14 @@ class ColorTable extends StatelessWidget {
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
       ),
-      itemCount: colors.length,
+      itemCount: colorsBody.length,
       itemBuilder: (BuildContext context, int index) {
-        final color = colors[index];
+        final color = colorsBody[index];
         return Padding(
           padding: const EdgeInsets.all(4),
           child: GestureDetector(
             onTap: () {
-              Navigator.of(context).pop();
+              Navigator.of(context).pop(index);
             },
             child: Transform.scale(
               scale: 0.8,

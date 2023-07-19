@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:note_app/model/note_model.dart';
-import 'package:note_app/screens/new_note.dart';
 import 'package:note_app/widgets/triangle_conner.dart';
 
 class NoteItem extends StatefulWidget {
@@ -15,11 +14,10 @@ class NoteItem extends StatefulWidget {
 class _NoteItemState extends State<NoteItem> {
   @override
   Widget build(BuildContext context) {
+    var noteTitle = widget.noteModel.title;
+    var noteBody = widget.noteModel.noteBody;
     // TODO: implement build
     return GestureDetector(
-      onTap: () {
-
-      },
       child: Container(
         width: double.infinity,
         height: 100,
@@ -31,7 +29,9 @@ class _NoteItemState extends State<NoteItem> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(widget.noteModel.title,
+                  Text(noteTitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                           fontSize: 20,
                           color: Colors.black,
@@ -39,7 +39,9 @@ class _NoteItemState extends State<NoteItem> {
                   const SizedBox(
                     height: 25,
                   ),
-                  Text(widget.noteModel.noteBody,
+                  Text(noteBody ,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                           fontSize: 16,
                           color: Color.fromARGB(255, 100, 98, 89))),
