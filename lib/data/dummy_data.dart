@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:note_app/model/note_model.dart';
-
-var availableNotes = [
-  NoteModel('Morning', 'Things Todo morning', DateTime.now()),
-  NoteModel('Afternoon', 'Things Todo afternoon', DateTime.now()),
-  NoteModel(' Night', 'Things Todo night', DateTime.now()),
-];
+//
+// var availableNotes = [
+//   NoteModel('Morning', 'Things Todo morning', DateTime.now()),
+//   NoteModel('Afternoon', 'Things Todo afternoon', DateTime.now()),
+//   NoteModel(' Night', 'Things Todo night', DateTime.now()),
+// ];
 
 const colorsAppBar = [
   Color.fromARGB(255, 255, 242, 171),

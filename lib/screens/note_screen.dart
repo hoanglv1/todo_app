@@ -4,16 +4,18 @@ import 'package:note_app/database/todo_database.dart';
 import 'package:note_app/model/note_model.dart';
 import 'package:note_app/widgets/color_table.dart';
 
-class NewNote extends StatefulWidget {
-  const NewNote({super.key, required this.refreshCallback});
+class NoteScreen extends StatefulWidget {
+  NoteScreen({super.key, this.refreshCallback, required this.mode, this.note});
 
-  final Function refreshCallback;
+  Function? refreshCallback;
+  final String mode;
+  NoteModel? note;
 
   @override
   State<StatefulWidget> createState() => _NewNote();
 }
 
-class _NewNote extends State<NewNote> {
+class _NewNote extends State<NoteScreen> {
   final _noteContentController = TextEditingController();
   String noteTitle = "";
   String noteBody = "";
@@ -22,11 +24,29 @@ class _NewNote extends State<NewNote> {
   final database = TodoDB();
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.mode == "edit" && widget.note != null) {
+      _noteContentController.text = widget.note!.noteBody;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: colorAppBar,
-        actions: [IconButton(onPressed: () {}, icon: const Icon(Icons.delete))],
+        actions: widget.mode == "edit"
+            ? [
+                IconButton(
+                    onPressed: () {
+                      database.deleteNote(widget.note!);
+                      widget.refreshCallback!();
+                      Navigator.pop(context);
+                    },
+                    icon: const Icon(Icons.delete))
+              ]
+            : null,
         iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: Column(children: [
@@ -85,8 +105,6 @@ class _NewNote extends State<NewNote> {
     );
   }
 
-
-
   _submitNote(String noteTitle, String noteBody) {
     // Handle Note Data
     String noteContent = _noteContentController.text.trim();
@@ -96,11 +114,10 @@ class _NewNote extends State<NewNote> {
     }
     List<String> noteLines = noteContent.split('\n');
     noteTitle = noteLines.first;
-    noteBody = (noteLines.length > 1) ? noteLines.sublist(1).join('\n') : '';
     // Add Note Data
-    var newNote = NoteModel(noteTitle, noteBody, DateTime.now());
+    var newNote = NoteModel(null, noteTitle, noteContent, DateTime.now());
     database.insertNotes(newNote.title, newNote.noteBody, newNote.dateTimeDay);
-    widget.refreshCallback();
+    widget.refreshCallback!();
     Navigator.pop(context);
   }
 

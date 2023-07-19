@@ -3,7 +3,10 @@ import 'package:note_app/model/note_model.dart';
 import 'package:note_app/widgets/note_item.dart';
 
 class ListNoteItem extends StatelessWidget {
-  const ListNoteItem({super.key, required this.noteList});
+  const ListNoteItem(
+      {super.key, required this.noteList, required this.refreshCallback});
+
+  final Function refreshCallback;
 
   final List<NoteModel> noteList;
 
@@ -15,6 +18,7 @@ class ListNoteItem extends StatelessWidget {
       itemBuilder: (context, index) => Padding(
         padding: const EdgeInsets.symmetric(vertical: 8),
         child: NoteItem(
+          refreshCallback: refreshCallback,
           noteModel: noteList[index],
         ),
       ),

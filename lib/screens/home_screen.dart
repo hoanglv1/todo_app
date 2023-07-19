@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:note_app/database/todo_database.dart';
 import 'package:note_app/model/note_model.dart';
-import 'package:note_app/screens/new_note.dart';
+import 'package:note_app/screens/note_screen.dart';
 import 'package:note_app/widgets/list_note_item.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -11,16 +11,14 @@ class HomeScreen extends StatefulWidget {
   State<StatefulWidget> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
+class _HomeScreenState extends State<HomeScreen> {
   var isFocus = false;
-  var note = NoteModel('Morning', 'Things Todo morning', DateTime.now());
   Future<List<NoteModel>> notesList = Future<List<NoteModel>>.value([]);
   final database = TodoDB();
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
     notesList = database.getAllNotes();
   }
 
@@ -47,8 +45,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>
-                      NewNote(refreshCallback: _refreshNotesList),
+                  builder: (context) => NoteScreen(
+                      refreshCallback: _refreshNotesList, mode: "new"),
                 ),
               );
             },
@@ -105,7 +103,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   } else {
                     List<NoteModel> notes = snapshot.data!;
                     return Expanded(
-                      child: ListNoteItem(noteList: notes),
+                      child: ListNoteItem(
+                          noteList: notes, refreshCallback: _refreshNotesList),
                     );
                   }
                 },

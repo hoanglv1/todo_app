@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:note_app/model/note_model.dart';
+import 'package:note_app/screens/note_screen.dart';
 import 'package:note_app/widgets/triangle_conner.dart';
 
 class NoteItem extends StatefulWidget {
-  const NoteItem({super.key, required this.noteModel});
+  const NoteItem(
+      {super.key, required this.noteModel, required this.refreshCallback});
 
+  final Function refreshCallback;
   final NoteModel noteModel;
 
   @override
@@ -14,10 +17,23 @@ class NoteItem extends StatefulWidget {
 class _NoteItemState extends State<NoteItem> {
   @override
   Widget build(BuildContext context) {
+    var noteId = widget.noteModel.id;
     var noteTitle = widget.noteModel.title;
     var noteBody = widget.noteModel.noteBody;
-    // TODO: implement build
+    var noteDate = widget.noteModel.date;
     return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => NoteScreen(
+              refreshCallback: widget.refreshCallback,
+              mode: 'edit',
+              note: NoteModel(noteId, noteTitle, noteBody, noteDate),
+            ),
+          ),
+        );
+      },
       child: Container(
         width: double.infinity,
         height: 100,
@@ -39,7 +55,10 @@ class _NoteItemState extends State<NoteItem> {
                   const SizedBox(
                     height: 25,
                   ),
-                  Text(noteBody ,
+                  Text(
+                      noteBody.split('\n').length > 1
+                          ? noteBody.split('\n')[1]
+                          : "",
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(

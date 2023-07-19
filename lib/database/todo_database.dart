@@ -34,6 +34,15 @@ class TodoDB {
     }
   }
 
+  Future<void> deleteNote(NoteModel note) async {
+    final database = await DBService().database;
+    await database.delete(
+      'notes',
+      where: 'note_id = ?',
+      whereArgs: [note.id],
+    );
+  }
+
   Future<List<NoteModel>> getAllNotes() async {
     final database = await DBService().database;
 
@@ -41,6 +50,7 @@ class TodoDB {
 
     final List<NoteModel> notes = results.map((note) {
       return NoteModel(
+        note['note_id'],
         note['note_title'],
         note['note_content'],
         formatter.parse(note['note_date']),
