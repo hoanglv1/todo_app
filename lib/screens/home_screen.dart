@@ -94,8 +94,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     return const CircularProgressIndicator();
                   } else if (snapshot.hasError) {
                     return Text('Đã xảy ra lỗi: ${snapshot.error}');
-                  } else if (!snapshot.hasData) {
-                    return const Text('Không có data', style: TextStyle(color: Colors.black,fontSize: 49),);
+                  } else if (snapshot.data!.isEmpty) {
+                    return Column(children: [
+                      Image.asset('assets/note_image.png',
+                          width: 200, height: 200),
+                      const SizedBox(height: 20),
+                      const Text('Note is Empty',
+                          style: TextStyle(fontSize: 24, color: Colors.black))
+                    ]);
                   } else {
                     List<NoteModel> notes = snapshot.data!;
                     return Expanded(
