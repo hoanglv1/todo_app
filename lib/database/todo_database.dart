@@ -25,13 +25,7 @@ class TodoDB {
         '''INSERT INTO notes (note_title, note_content, note_date) VALUES (?, ?, ?)''';
 
     final List<dynamic> values = [noteTitle, noteContent, noteDate];
-
-    try {
-      await database.rawInsert(insertQuery, values);
-      print('insert thành công');
-    } catch (e) {
-      print('insert thất bại');
-    }
+    await database.rawInsert(insertQuery, values);
   }
 
   Future<void> deleteNote(NoteModel note) async {
@@ -43,11 +37,19 @@ class TodoDB {
     );
   }
 
+  void updateNoteById(int id, String noteTitle, String noteBody) async {
+    final database = await DBService().database;
+    await database.update(
+      'notes',
+      {'note_title': noteTitle, 'note_content': noteBody},
+      where: 'note_id = ?',
+      whereArgs: [id],
+    );
+  }
+
   Future<List<NoteModel>> getAllNotes() async {
     final database = await DBService().database;
-
     final List<Map<String, dynamic>> results = await database.query('notes');
-
     final List<NoteModel> notes = results.map((note) {
       return NoteModel(
         note['note_id'],

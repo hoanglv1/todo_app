@@ -115,8 +115,13 @@ class _NewNote extends State<NoteScreen> {
     List<String> noteLines = noteContent.split('\n');
     noteTitle = noteLines.first;
     // Add Note Data
-    var newNote = NoteModel(null, noteTitle, noteContent, DateTime.now());
-    database.insertNotes(newNote.title, newNote.noteBody, newNote.dateTimeDay);
+    if (widget.mode == "new") {
+      var newNote = NoteModel(null, noteTitle, noteContent, DateTime.now());
+      database.insertNotes(
+          newNote.title, newNote.noteBody, newNote.dateTimeDay);
+    } else {
+      database.updateNoteById(widget.note!.id!, noteTitle, noteContent);
+    }
     widget.refreshCallback!();
     Navigator.pop(context);
   }
