@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:note_app/data/dummy_data.dart';
 import 'package:note_app/model/note_model.dart';
 import 'package:note_app/screens/note_screen.dart';
 import 'package:note_app/widgets/triangle_conner.dart';
@@ -21,6 +22,7 @@ class _NoteItemState extends State<NoteItem> {
     var noteTitle = widget.noteModel.title;
     var noteBody = widget.noteModel.noteBody;
     var noteDate = widget.noteModel.date;
+    var noteBackgroundColor = widget.noteModel.noteColor;
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -29,7 +31,8 @@ class _NoteItemState extends State<NoteItem> {
             builder: (context) => NoteScreen(
               refreshCallback: widget.refreshCallback,
               mode: 'edit',
-              note: NoteModel(noteId, noteTitle, noteBody, noteDate),
+              note: NoteModel(
+                  noteId, noteTitle, noteBody, noteDate, noteBackgroundColor),
             ),
           ),
         );
@@ -37,7 +40,7 @@ class _NoteItemState extends State<NoteItem> {
       child: Container(
         width: double.infinity,
         height: 100,
-        color: const Color.fromARGB(255, 255, 247, 209),
+        color: colorsBody[widget.noteModel.noteColor],
         child: Row(
           children: [
             Padding(

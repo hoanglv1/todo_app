@@ -17,8 +17,10 @@ class NoteScreen extends StatefulWidget {
 
 class _NewNote extends State<NoteScreen> {
   final _noteContentController = TextEditingController();
+  var colorPosition = 0;
   String noteTitle = "";
   String noteBody = "";
+  var noteColor = 0;
   Color colorAppBar = colorsAppBar[0];
   Color colorBody = colorsBody[0];
   final database = TodoDB();
@@ -28,6 +30,7 @@ class _NewNote extends State<NoteScreen> {
     super.initState();
     if (widget.mode == "edit" && widget.note != null) {
       _noteContentController.text = widget.note!.noteBody;
+      noteColor = widget.note!.noteColor;
     }
   }
 
@@ -35,7 +38,8 @@ class _NewNote extends State<NoteScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: colorAppBar,
+        backgroundColor:
+            widget.mode == "edit" ? colorsAppBar[noteColor] : colorAppBar,
         actions: widget.mode == "edit"
             ? [
                 IconButton(
@@ -54,7 +58,7 @@ class _NewNote extends State<NoteScreen> {
           child: SingleChildScrollView(
             child: Container(
               height: MediaQuery.of(context).size.height,
-              color: colorBody,
+              color: widget.mode == "edit" ? colorsBody[noteColor] : colorBody,
               child: Padding(
                 padding: const EdgeInsets.all(8),
                 child: TextField(
@@ -70,7 +74,7 @@ class _NewNote extends State<NoteScreen> {
           ),
         ),
         Container(
-          color: colorBody,
+          color: widget.mode == "edit" ? colorsBody[noteColor] : colorBody,
           child: Row(
             children: [
               IconButton(
@@ -116,11 +120,13 @@ class _NewNote extends State<NoteScreen> {
     noteTitle = noteLines.first;
     // Add Note Data
     if (widget.mode == "new") {
-      var newNote = NoteModel(null, noteTitle, noteContent, DateTime.now());
+      var newNote = NoteModel(
+          null, noteTitle, noteContent, DateTime.now(), colorPosition);
       database.insertNotes(
-          newNote.title, newNote.noteBody, newNote.dateTimeDay);
+          newNote.title, newNote.noteBody, newNote.dateTimeDay, 0);
     } else {
-      database.updateNoteById(widget.note!.id!, noteTitle, noteContent);
+      database.updateNoteById(
+          widget.note!.id!, noteTitle, noteContent, noteColor);
     }
     widget.refreshCallback!();
     Navigator.pop(context);
@@ -142,6 +148,11 @@ class _NewNote extends State<NoteScreen> {
       setState(() {
         colorAppBar = colorsAppBar[result];
         colorBody = colorsBody[result];
+        if (widget.mode == "edit") {
+          noteColor = result;
+        } else {
+          colorPosition = result;
+        }
       });
     }
   }
