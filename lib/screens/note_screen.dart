@@ -6,6 +6,7 @@ import 'package:note_app/database/todo_database.dart';
 import 'package:note_app/model/note_model.dart';
 import 'package:note_app/widgets/color_table.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
 class NoteScreen extends StatefulWidget {
@@ -59,7 +60,7 @@ class _NewNote extends State<NoteScreen> {
                       Navigator.pop(context);
                     },
                     icon: const Icon(Icons.delete))
-        ]
+              ]
             : null,
         iconTheme: const IconThemeData(color: Colors.black),
       ),
@@ -182,9 +183,11 @@ class _NewNote extends State<NoteScreen> {
                 pw.Text('Title',
                     style: pw.TextStyle(
                         fontWeight: pw.FontWeight.bold, fontSize: 24)),
-                pw.DecoratedBox(decoration: BoxDecoration(
-                  border: Border(bottom: BorderSide(width: 1, color: Colors.black)),
-                ),),
+                pw.SizedBox(height: 10),
+                pw.Container(
+                    width: double.infinity,
+                    height: 1,
+                    color: PdfColor.fromInt(Colors.black.value)),
                 pw.SizedBox(height: 10),
                 pw.Text(text)
               ]);
