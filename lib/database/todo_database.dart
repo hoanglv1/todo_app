@@ -67,4 +67,23 @@ class TodoDB {
     }).toList();
     return notes;
   }
+
+  Future<List<NoteModel>> getAllNoteWithSearchedTitle(String title) async {
+    final database = await DBService().database;
+    final List<Map<String, dynamic>> results = await database.query(
+      'notes',
+      where: 'note_title LIKE ?',
+      whereArgs: ['%$title%'],
+    );
+    final List<NoteModel> notes = results.map((note) {
+      return NoteModel(
+        note['note_id'],
+        note['note_title'],
+        note['note_content'],
+        formatter.parse(note['note_date']),
+        note['note_color'],
+      );
+    }).toList();
+    return notes;
+  }
 }

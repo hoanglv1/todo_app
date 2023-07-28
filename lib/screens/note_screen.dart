@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:note_app/data/dummy_data.dart';
 import 'package:note_app/database/todo_database.dart';
 import 'package:note_app/model/note_model.dart';
+import 'package:note_app/utils/DateTimeUtils.dart';
 import 'package:note_app/widgets/color_table.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
@@ -47,22 +48,23 @@ class _NewNote extends State<NoteScreen> {
             widget.mode == "edit"
                 ? widget.note!.dateTimeDay
                 : "Creating New Note",
-            style: TextStyle(color: Colors.black)),
+            style: const TextStyle(color: Colors.black)),
         centerTitle: true,
         backgroundColor:
             widget.mode == "edit" ? colorsAppBar[noteColor] : colorAppBar,
-        actions: widget.mode == "edit"
-            ? [
-                IconButton(
-                    onPressed: () {
-                      database.deleteNote(widget.note!);
-                      widget.refreshCallback!();
-                      Navigator.pop(context);
-                    },
-                    icon: const Icon(Icons.delete))
-              ]
-            : null,
-        iconTheme: const IconThemeData(color: Colors.black),
+        actions: [
+          IconButton(
+              onPressed: () {
+                if (widget.mode == "edit") {
+                  _deleteNote();
+                }
+              },
+              icon: Icon(Icons.delete,
+                  color: widget.mode == "edit" ? Colors.black : Colors.grey))
+        ],
+        iconTheme: const IconThemeData(
+          color: Colors.black,
+        ),
       ),
       body: Column(children: [
         Expanded(
@@ -103,7 +105,9 @@ class _NewNote extends State<NoteScreen> {
                       _exportToPdf();
                     }
                   },
-                  icon: const Icon(Icons.picture_as_pdf_outlined, size: 40)),
+                  icon: Icon(Icons.picture_as_pdf_outlined,
+                      size: 40,
+                      color: widget.mode == 'new' ? Colors.grey : null)),
               const Spacer(),
               IconButton(
                   onPressed: () {
@@ -116,6 +120,12 @@ class _NewNote extends State<NoteScreen> {
         ),
       ]),
     );
+  }
+
+  _deleteNote() {
+    database.deleteNote(widget.note!);
+    widget.refreshCallback!();
+    Navigator.pop(context);
   }
 
   _submitNote() {
@@ -194,34 +204,39 @@ class _NewNote extends State<NoteScreen> {
         },
       ),
     );
-
-    // Get the document directory path
-    Directory appDocDir = await getApplicationDocumentsDirectory();
-    String appDocPath = appDocDir.path;
-
     // Create the PDF file
-    File file = File('$appDocPath/example.pdf');
+    savePDFFile(pdf);
+  }
 
-    // Write the PDF content to the file
+  Future<void> savePDFFile(pw.Document pdf) async {
+    Directory? appDocDir = await getExternalStorageDirectory();
+    String appDocPath = appDocDir!.path;
+    String fileName = '${DateTimeUtils().getCurrentTimeInMilli()}.pdf';
+    String fileLocation = '$appDocPath/$fileName';
+    File file = File(fileLocation);
     await file.writeAsBytes(await pdf.save());
+    showExportPDFDialog(fileLocation);
+  }
 
-    // Show a dialog with the path to the PDF file
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text("Export to PDF"),
-          content: Text("PDF file saved to: $appDocPath/example.pdf"),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text("OK"),
-            ),
-          ],
-        );
-      },
-    );
+  Future<void> showExportPDFDialog(String fileLocation) async {
+    if (context.mounted) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text("Export to PDF"),
+            content: Text("PDF file saved to: $fileLocation"),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 }

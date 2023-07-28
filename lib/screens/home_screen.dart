@@ -12,6 +12,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final searchCondition = TextEditingController();
   var isFocus = false;
   Future<List<NoteModel>> notesList = Future<List<NoteModel>>.value([]);
   final database = TodoDB();
@@ -61,6 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             children: [
               TextField(
+                controller: searchCondition,
                 onTapOutside: (event) {
                   FocusManager.instance.primaryFocus?.unfocus();
                   setState(() {
@@ -70,6 +72,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 onTap: () {
                   setState(() {
                     isFocus = true;
+                  });
+                },
+                onChanged: (value) {
+                  setState(() {
+                    notesList =  database.getAllNoteWithSearchedTitle(value);
                   });
                 },
                 decoration: InputDecoration(
