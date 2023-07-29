@@ -21,8 +21,10 @@ class _NoteItemState extends State<NoteItem> {
     var noteId = widget.noteModel.id;
     var noteTitle = widget.noteModel.title;
     var noteBody = widget.noteModel.noteBody;
-    var noteDate = widget.noteModel.date;
+    var noteDate = widget.noteModel.dateCreated;
     var noteBackgroundColor = widget.noteModel.noteColor;
+    var noteSetDate = widget.noteModel.dateNotify;
+    var isNoteNotifySet = widget.noteModel.isDateNotifySet;
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -31,8 +33,9 @@ class _NoteItemState extends State<NoteItem> {
             builder: (context) => NoteScreen(
               refreshCallback: widget.refreshCallback,
               mode: 'edit',
-              note: NoteModel(
-                  noteId, noteTitle, noteBody, noteDate, noteBackgroundColor),
+              note: NoteModel(noteId, noteTitle, noteBody, noteDate,
+                  noteBackgroundColor, noteSetDate,
+                  isDateNotifySet: isNoteNotifySet),
             ),
           ),
         );
@@ -76,7 +79,7 @@ class _NoteItemState extends State<NoteItem> {
                 padding: const EdgeInsets.all(8),
                 child: Align(
                   alignment: Alignment.topRight,
-                  child: Text(widget.noteModel.dateTimeDay,
+                  child: Text(widget.noteModel.dateTimeDayFormat,
                       style: const TextStyle(
                           fontSize: 14,
                           color: Color.fromARGB(255, 100, 98, 89))),

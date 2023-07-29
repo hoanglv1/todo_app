@@ -35,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     _requestNotificationPermissionIfNeed();
+    NoteNotfication().configureLocalTimeZone();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -47,15 +48,13 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             onPressed: () {
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (context) => NoteScreen(
-              //         refreshCallback: _refreshNotesList, mode: "new"),
-              //   ),
-              // );
-
-              NoteNotfication().showNotification(title: "Hoang", body: "Chinh");
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => NoteScreen(
+                      refreshCallback: _refreshNotesList, mode: "new"),
+                ),
+              );
             },
             icon: const Icon(Icons.note_add, size: 30),
             color: Colors.black,

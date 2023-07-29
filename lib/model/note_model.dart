@@ -6,14 +6,22 @@ class NoteModel {
   final int? id;
   final String title;
   final String noteBody;
-  final DateTime date;
+  final DateTime dateCreated;
   final int noteColor;
+  final DateTime? dateNotify;
+  final int isDateNotifySet;
 
+  NoteModel(this.id, this.title, this.noteBody, this.dateCreated,
+      this.noteColor, this.dateNotify,
+      {this.isDateNotifySet = 1});
 
-  NoteModel(this.id, this.title, this.noteBody, this.date, this.noteColor);
+  String get dateTimeDayFormat {
+    String formattedDate = DateFormat('dd-MM-yyyy').format(dateCreated);
+    return formattedDate;
+  }
 
-  String get dateTimeDay {
-    String formattedDate = DateFormat('dd-MM-yyyy').format(date);
+  String get dateNotifyFormat {
+    String formattedDate = DateFormat('dd-MM-yyyy').format(dateNotify!);
     return formattedDate;
   }
 }

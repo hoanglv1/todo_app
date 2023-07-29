@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:note_app/data/dummy_data.dart';
 import 'package:note_app/database/todo_database.dart';
 import 'package:note_app/model/note_model.dart';
+import 'package:note_app/notification/NoteNotification.dart';
 import 'package:note_app/utils/DateTimeUtils.dart';
 import 'package:note_app/widgets/color_table.dart';
 import 'package:path_provider/path_provider.dart';
@@ -22,6 +23,7 @@ class NoteScreen extends StatefulWidget {
 }
 
 class _NewNote extends State<NoteScreen> {
+  final database = TodoDB();
   final _noteContentController = TextEditingController();
   var colorPosition = 0;
   String noteTitle = "";
@@ -29,7 +31,8 @@ class _NewNote extends State<NoteScreen> {
   var noteColor = 0;
   Color colorAppBar = colorsAppBar[0];
   Color colorBody = colorsBody[0];
-  final database = TodoDB();
+  DateTime dateNotify = DateTime.now();
+  int isNotifySet = 1;
 
   @override
   void initState() {
@@ -46,7 +49,7 @@ class _NewNote extends State<NoteScreen> {
       appBar: AppBar(
         title: Text(
             widget.mode == "edit"
-                ? widget.note!.dateTimeDay
+                ? widget.note!.dateTimeDayFormat
                 : "Creating New Note",
             style: const TextStyle(color: Colors.black)),
         centerTitle: true,
@@ -108,6 +111,12 @@ class _NewNote extends State<NoteScreen> {
                   icon: Icon(Icons.picture_as_pdf_outlined,
                       size: 40,
                       color: widget.mode == 'new' ? Colors.grey : null)),
+              const SizedBox(width: 10),
+              IconButton(
+                  onPressed: () {
+                    _setDateTimeNotify();
+                  },
+                  icon: const Icon(Icons.alarm_outlined, size: 40)),
               const Spacer(),
               IconButton(
                   onPressed: () {
@@ -139,16 +148,40 @@ class _NewNote extends State<NoteScreen> {
     var noteTitle = noteLines.first;
     // Add Note Data
     if (widget.mode == "new") {
-      var newNote = NoteModel(
-          null, noteTitle, noteContent, DateTime.now(), colorPosition);
-      database.insertNotes(newNote.title, newNote.noteBody, newNote.dateTimeDay,
-          newNote.noteColor);
+      var newNote = NoteModel(null, noteTitle, noteContent, DateTime.now(),
+          colorPosition, dateNotify,
+          isDateNotifySet: isNotifySet);
+      database.insertNotes(
+          newNote.title,
+          newNote.noteBody,
+          newNote.dateTimeDayFormat,
+          newNote.noteColor,
+          newNote.dateNotifyFormat,
+          isNotifySet: newNote.isDateNotifySet);
+      if (newNote.isDateNotifySet == 0) {
+        var notifyBeforeTwoHours = 7200000000;
+        var interval  = dateNotify.microsecondsSinceEpoch - DateTime.now().microsecondsSinceEpoch - notifyBeforeTwoHours;
+        NoteNotfication()
+            .showNotificationByTimeSet(newNote, interval);
+      }
     } else {
       database.updateNoteById(
           widget.note!.id!, noteTitle, noteContent, noteColor);
     }
     widget.refreshCallback!();
     Navigator.pop(context);
+  }
+
+  _setDateTimeNotify() async {
+    var result = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime.now(),
+        lastDate: DateTime(2100));
+    if (result != null) {
+      isNotifySet = 0;
+      dateNotify = result;
+    }
   }
 
   _changeNoteColorBackground() async {
