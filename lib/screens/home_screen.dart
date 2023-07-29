@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:note_app/database/todo_database.dart';
 import 'package:note_app/model/note_model.dart';
+import 'package:note_app/notification/NoteNotification.dart';
 import 'package:note_app/screens/note_screen.dart';
 import 'package:note_app/widgets/list_note_item.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -31,6 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    _requestNotificationPermissionIfNeed();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -43,13 +47,15 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => NoteScreen(
-                      refreshCallback: _refreshNotesList, mode: "new"),
-                ),
-              );
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(
+              //     builder: (context) => NoteScreen(
+              //         refreshCallback: _refreshNotesList, mode: "new"),
+              //   ),
+              // );
+
+              NoteNotfication().showNotification(title: "Hoang", body: "Chinh");
             },
             icon: const Icon(Icons.note_add, size: 30),
             color: Colors.black,
@@ -76,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
                 onChanged: (value) {
                   setState(() {
-                    notesList =  database.getAllNoteWithSearchedTitle(value);
+                    notesList = database.getAllNoteWithSearchedTitle(value);
                   });
                 },
                 decoration: InputDecoration(
@@ -101,6 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     return Text('Đã xảy ra lỗi: ${snapshot.error}');
                   } else if (snapshot.data!.isEmpty) {
                     return Column(children: [
+                      const SizedBox(height: 100),
                       Image.asset('assets/note_image.png',
                           width: 200, height: 200),
                       const SizedBox(height: 20),
@@ -121,5 +128,17 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
+  }
+
+  _requestNotificationPermissionIfNeed() async {
+    if (await Permission.notification.isDenied) {
+      FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+          FlutterLocalNotificationsPlugin();
+      flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
+          ?.requestPermission();
+    }
+    NoteNotfication().initNotification();
   }
 }
