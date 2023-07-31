@@ -43,13 +43,12 @@ class NoteNotfication {
         id, title, body, await notificationDetails());
   }
 
-  Future showNotificationByTimeSet(NoteModel noteModel, int interval) async {
+  Future showNotificationByTimeSet(
+      NoteModel noteModel, DateTime scheduledDateTime) async {
     var scheduledNotificationDateTime =
-        tz.TZDateTime.now(tz.local).add(Duration(hours: interval));
-    int notificationId = 1;
-
+        tz.TZDateTime.from(scheduledDateTime, tz.local);
     await notificationsPlugin.zonedSchedule(
-      notificationId,
+      noteModel.id!,
       noteModel.title,
       noteModel.noteBody,
       scheduledNotificationDateTime,

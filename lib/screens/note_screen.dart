@@ -11,6 +11,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
+// ignore: must_be_immutable
 class NoteScreen extends StatefulWidget {
   NoteScreen({super.key, this.refreshCallback, required this.mode, this.note});
 
@@ -137,7 +138,7 @@ class _NewNote extends State<NoteScreen> {
     Navigator.pop(context);
   }
 
-  _submitNote() {
+  _submitNote() async {
     // Handle Note Data
     String noteContent = _noteContentController.text.trim();
     if (noteContent.isEmpty) {
@@ -148,7 +149,8 @@ class _NewNote extends State<NoteScreen> {
     var noteTitle = noteLines.first;
     // Add Note Data
     if (widget.mode == "new") {
-      var newNote = NoteModel(null, noteTitle, noteContent, DateTime.now(),
+      var noteID = await database.getLastNoteId();
+      var newNote = NoteModel(noteID, noteTitle, noteContent, DateTime.now(),
           colorPosition, dateNotify,
           isDateNotifySet: isNotifySet);
       database.insertNotes(
@@ -159,28 +161,43 @@ class _NewNote extends State<NoteScreen> {
           newNote.dateNotifyFormat,
           isNotifySet: newNote.isDateNotifySet);
       if (newNote.isDateNotifySet == 0) {
-        var notifyBeforeTwoHours = 7200000000;
-        var interval  = dateNotify.microsecondsSinceEpoch - DateTime.now().microsecondsSinceEpoch - notifyBeforeTwoHours;
-        NoteNotfication()
-            .showNotificationByTimeSet(newNote, interval);
+        NoteNotfication().showNotificationByTimeSet(newNote, dateNotify);
       }
-    } else {
+    }
+    else {
       database.updateNoteById(
-          widget.note!.id!, noteTitle, noteContent, noteColor);
+          widget.note!.id!, noteTitle, noteContent, noteColor,dateNotify);
+
     }
     widget.refreshCallback!();
     Navigator.pop(context);
   }
 
   _setDateTimeNotify() async {
-    var result = await showDatePicker(
+    var pickedDate = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
         firstDate: DateTime.now(),
         lastDate: DateTime(2100));
-    if (result != null) {
-      isNotifySet = 0;
-      dateNotify = result;
+
+    if (pickedDate != null) {
+      final TimeOfDay? pickedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.fromDateTime(pickedDate),
+      );
+      if (pickedTime != null) {
+        // Nếu giờ đã chọn, kết hợp ngày và giờ để tạo ra DateTime hoàn chỉnh
+        setState(() {
+          isNotifySet = 0;
+            dateNotify = DateTime(
+            pickedDate.year,
+            pickedDate.month,
+            pickedDate.day,
+            pickedTime.hour,
+            pickedTime.minute,
+          );
+        });
+      }
     }
   }
 

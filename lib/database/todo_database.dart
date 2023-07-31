@@ -4,7 +4,7 @@ import 'package:note_app/model/note_model.dart';
 import 'package:sqflite/sqflite.dart';
 
 class TodoDB {
-  final tableName = 'todo';
+  final tableName = 'notes';
   final String createTableQuery = '''CREATE TABLE notes (
   note_id INTEGER PRIMARY KEY AUTOINCREMENT,
   note_title TEXT,
@@ -50,15 +50,16 @@ class TodoDB {
     );
   }
 
-  void updateNoteById(
-      int id, String noteTitle, String noteBody, int noteColor) async {
+  void updateNoteById(int id, String noteTitle, String noteBody, int noteColor,
+      DateTime dateNotify) async {
     final database = await DBService().database;
     await database.update(
       'notes',
       {
         'note_title': noteTitle,
         'note_content': noteBody,
-        'note_color': noteColor
+        'note_color': noteColor,
+        'note_notify_date': dateNotify.toString()
       },
       where: 'note_id = ?',
       whereArgs: [id],
@@ -102,5 +103,24 @@ class TodoDB {
       );
     }).toList();
     return notes;
+  }
+
+  Future<int?> getLastNoteId() async {
+    try {
+      final database = await DBService().database;
+
+      List<Map<String, dynamic>> rows = await database.rawQuery(
+        'SELECT note_id FROM $tableName ORDER BY note_id DESC LIMIT 1',
+      );
+      if (rows.isNotEmpty) {
+        int lastNoteId = rows.first['note_id'] as int;
+        return lastNoteId;
+      } else {
+        return 0;
+      }
+    } catch (e) {
+      print('Error getting last note_id: $e');
+    }
+    return 0;
   }
 }
